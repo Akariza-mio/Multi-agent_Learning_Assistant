@@ -22,7 +22,7 @@ def get_vectorstore():
     return _vectorstore
 
 def retrieve_knowledge(query: str, k: int = 3) -> str:
-    """检索相关的操作系统知识片段"""
+    """检索相关的专业课程知识片段"""
     vs = get_vectorstore()
     if not vs:
         return "暂无本地知识库数据，请先运行 build_knowledge_base.py"

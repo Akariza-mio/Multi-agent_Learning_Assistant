@@ -4,7 +4,7 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharac
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
-MARKDOWN_PATH = os.path.join(os.path.dirname(__file__), '..', 'OS复习.md')
+MARKDOWN_PATH = os.path.join(os.path.dirname(__file__), '..', '课程复习.md')
 CHROMA_DB_DIR = os.path.join(os.path.dirname(__file__), 'chroma_db')
 LOCAL_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'all-MiniLM-L6-v2')
 
