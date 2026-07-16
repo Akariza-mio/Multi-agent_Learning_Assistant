@@ -691,7 +691,6 @@ function renderPPTResultUI(pptData) {
         <div class="ppt-slide" style="position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, ${tBg} 0%, rgba(0,0,0,0.1) 100%); padding: 8%; box-sizing: border-box;">
             <h1 style="font-size: 54px; color: ${tText}; margin-bottom: 20px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.1); letter-spacing: 2px;">${pptData.title || 'AI 生成演示文稿'}</h1>
             ${pptData.subtitle ? `<p style="font-size: 24px; color: ${tAccent}; opacity: 0.9; margin-bottom: 30px; font-weight: 500;">${pptData.subtitle}</p>` : ''}
-            <p style="font-size: 16px; color: ${tText}; opacity: 0.6; margin-top: auto;">Powered by OS Multi-Agent System</p>
         </div>
     `;
     
@@ -925,7 +924,6 @@ function downloadPPT() {
     if (currentPptJson.subtitle) {
         slideTitle.addText(currentPptJson.subtitle, { x: 1, y: 3.2, w: 8, h: 0.8, fontSize: 24, color: textColor, align: "center", bold: true });
     }
-    slideTitle.addText("Powered by OS Multi-Agent System", { x: 1, y: 4.8, w: 8, h: 1, fontSize: 16, color: "7F8C8D", align: "center" });
     
     // 内容页
     if (currentPptJson.slides) {
