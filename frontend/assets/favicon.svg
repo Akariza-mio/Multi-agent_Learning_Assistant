@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <!-- 背景圆角矩形 -->
+    <rect width="100" height="100" rx="20" fill="url(#bg-gradient)"/>
+    
+    <!-- 渐变定义 -->
+    <defs>
+        <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3b82f6"/> <!-- 科技蓝 -->
+            <stop offset="100%" stop-color="#8b5cf6"/> <!-- 梦幻紫 -->
+        </linearGradient>
+    </defs>
+    
+    <!-- 中心的神经元/智能体节点连接图案 -->
+    <circle cx="50" cy="40" r="12" fill="#ffffff"/>
+    <circle cx="30" cy="70" r="8" fill="#ffffff" fill-opacity="0.8"/>
+    <circle cx="70" cy="70" r="8" fill="#ffffff" fill-opacity="0.8"/>
+    
+    <path d="M 50 40 L 30 70 M 50 40 L 70 70 M 30 70 L 70 70" stroke="#ffffff" stroke-width="4" stroke-opacity="0.5"/>
+    
+    <!-- 发光的星星符号（代表灵感/星火） -->
+    <path d="M 50 15 L 53 25 L 63 28 L 53 31 L 50 41 L 47 31 L 37 28 L 47 25 Z" fill="#fbbf24"/>
+</svg>

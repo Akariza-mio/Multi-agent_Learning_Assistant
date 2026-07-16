@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多智能体学习辅导系统</title>
+    <!-- 引入刚刚设计的网站图标 -->
+    <link rel="icon" type="image/svg+xml" href="/static/assets/favicon.svg">
+    <!-- 引入 Google Fonts (Outfit & Inter) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/static/styles.css?v=2">
+    <!-- 引入 Markdown 渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 引入 Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <!-- 引入 PptxGenJS 用于生成 PPTX 文件 -->
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/libs/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- 左侧：画像面板 (Profiler) -->
+        <aside class="glass-panel profile-panel">
+            <!-- 历史会话管理 -->
+            <div class="session-section">
+                <div class="session-header">
+                    <button id="new-chat-btn" class="new-chat-btn" style="flex: 1; margin-right: 12px;">
+                        <span class="icon">➕</span> 新建对话
+                    </button>
+                    <button id="theme-toggle" class="theme-toggle-btn" title="切换暗色/亮色模式">🌙</button>
+                </div>
+                <div class="session-list-container">
+                    <ul id="session-list" class="session-list">
+                        <!-- 会话列表项将动态渲染 -->
+                    </ul>
+                </div>
+            </div>
+            <h2 style="margin-bottom: 4px;"><span class="icon">👤</span> 学生学习画像</h2>
+            <p class="subtitle" style="margin-top: 0; margin-bottom: 12px;">智能体动态捕捉您的 6 维特征</p>
+            <button id="reset-profile-btn" title="清空并重置全局学习画像"
+                onclick="if(confirm('确定要清空全局学习画像吗？这将使智能体忘记您当前的全部 6 维状态。')){ localStorage.removeItem('agent_global_profile'); if(window.updateProfileUI){ window.updateProfileUI(null); } else { window.location.reload(); } alert('画像已成功清空！'); }"
+                style="width: 100%; background: var(--card-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px; border-radius: 8px; transition: all 0.2s; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                🔄 重置学生画像
+            </button>
+
+            <div class="profile-cards">
+                <div class="profile-card">
+                    <h3>📚 知识基础</h3>
+                    <p id="prof-kb">未知</p>
+                </div>
+                <div class="profile-card">
+                    <h3>⚠️ 易错点偏好</h3>
+                    <p id="prof-err">未知</p>
+                </div>
+                <div class="profile-card">
+                    <h3>📈 学习进度</h3>
+                    <p id="prof-prog">未知</p>
+                </div>
+                <div class="profile-card">
+                    <h3>🎯 兴趣方向</h3>
+                    <p id="prof-int">未知</p>
+                </div>
+                <div class="profile-card">
+                    <h3>🛡️ 抗挫折能力</h3>
+                    <p id="prof-frus">未知</p>
+                </div>
+                <div class="profile-card">
+                    <h3>💡 好奇心</h3>
+                    <p id="prof-cur">未知</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右侧主内容区 (对话 + 资源展示合并) -->
+        <main class="glass-panel content-panel">
+            <div class="tabs">
+                <button class="tab-btn active" data-target="tab-chat">💬 智能对话</button>
+                <button class="tab-btn" data-target="tab-doc">📄 讲解文档</button>
+                <button class="tab-btn" data-target="tab-path">🗺️ 学习路径</button>
+                <button class="tab-btn" data-target="tab-code">💻 代码示例</button>
+                <button class="tab-btn" data-target="tab-ext">🔗 拓展阅读</button>
+                <button class="tab-btn" data-target="tab-rec">🎯 资源推荐</button>
+                <button class="tab-btn" data-target="tab-map">🗺️ 思维导图</button>
+                <button class="tab-btn" data-target="tab-ppt">📊 幻灯片PPT</button>
+            </div>
+
+            <div class="tab-content-area">
+                <!-- 对话交互页 -->
+                <div id="tab-chat" class="tab-pane active chat-pane">
+                    <div class="chat-box" id="chat-box">
+                        <div class="message ai-message">
+                            <div class="avatar">🤖</div>
+                            <div class="bubble">你好！我是您的多智能体学习辅导老师。请问您今天想复习或学习哪部分知识？</div>
+                        </div>
+                    </div>
+                    <div id="image-preview-container"
+                        style="display: none; position: relative; padding: 0 10px 10px 10px;">
+                        <img id="image-preview" src=""
+                            style="max-height: 80px; border-radius: 8px; border: 1px solid var(--glass-border); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <button id="remove-image-btn"
+                            style="position: absolute; top: -8px; left: 80px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 14px; line-height: 1; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>
+                    </div>
+                    <div class="input-area">
+                        <label for="image-upload" class="upload-btn" title="上传图片分析">
+                            <span style="font-size: 1.3rem;">🖼️</span>
+                        </label>
+                        <input type="file" id="image-upload" accept="image/*" style="display: none;">
+
+                        <input type="text" id="chat-input" placeholder="输入您想学习的知识点或带图提问..." />
+                        <button id="send-btn">发送</button>
+                    </div>
+                </div>
+
+                <div id="tab-doc" class="tab-pane markdown-body">
+                    <div class="empty-state">请在【智能对话】中提问以生成专属讲解文档...</div>
+                </div>
+                <div id="tab-map" class="tab-pane">
+                    <div class="map-input-area"
+                        style="padding: 15px; border-bottom: 1px solid var(--glass-border); display: flex; gap: 10px;">
+                        <input type="text" id="map-input" placeholder="输入要生成导图的知识点（如：进程调度算法）..."
+                            style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                        <button id="map-btn"
+                            style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight:600;">生成导图</button>
+                    </div>
+                    <div class="empty-state">请在上方输入知识点生成专属思维导图...</div>
+                    <div id="mermaid-container"></div>
+                </div>
+                <div id="tab-code" class="tab-pane markdown-body">
+                    <div class="empty-state">请在【智能对话】中提问以生成底层代码示例...</div>
+                </div>
+                <div id="tab-ext" class="tab-pane markdown-body">
+                    <div class="empty-state">请在【智能对话】中提问以生成个性化拓展阅读...</div>
+                </div>
+                <div id="tab-rec" class="tab-pane markdown-body">
+                    <div class="empty-state">请在【智能对话】中提问以获取精准学习资源推送...</div>
+                </div>
+                <div id="tab-path" class="tab-pane markdown-body">
+                    <div id="learning-path-content">
+                        <div class="empty-state">等待 AI 规划...</div>
+                    </div>
+                </div>
+                <div id="tab-ppt" class="tab-pane">
+                    <div class="map-input-area"
+                        style="padding: 15px; border-bottom: 1px solid var(--glass-border); display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:10px; min-width: 250px;">
+                            <input type="text" id="ppt-input" placeholder="输入要生成 PPT 的核心主题（如：人工智能发展史）..."
+                                style="padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); width: 100%;">
+                            <input type="text" id="ppt-req-input" placeholder="输入 PPT 的具体要求（如：风格简洁，页数6页，多举例）..."
+                                style="padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); width: 100%;">
+                        </div>
+                        <button id="ppt-btn"
+                            style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight:600;">生成 PPT</button>
+                        <button id="ppt-download-btn"
+                            style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight:600; display: none;">下载 .pptx 文件</button>
+                    </div>
+                    <div class="empty-state" id="ppt-empty-state">请在上方输入主题，一键生成演示幻灯片...</div>
+                    <div id="ppt-container" style="padding: 20px; max-width: 800px; margin: 0 auto; display: none;">
+                        <!-- PPT 网页渲染区 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 全局 Loading 遮罩 -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>多智能体正在高强度协作中，请稍候...</p>
+    </div>
+
+    <!-- MathJax 渲染支持 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script src="/static/app.js?v=12"></script>
+</body>
+
+</html>
